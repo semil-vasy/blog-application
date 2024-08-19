@@ -3,9 +3,13 @@ package com.example.blog.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -21,47 +25,48 @@ public class Blog {
     @Column(nullable = false)
     private String title;
 
-    @Column
+    @Column(nullable = false)
     private String banner;
 
-    @Column(length = 200)
+    @Column(nullable = false, length = 200)
     private String description;
 
-    @Column
+    @Column(nullable = false, columnDefinition = "text")
     private String content;
 
-    @ElementCollection
-    private List<String> tags;
+    @Embedded
+    private BlogActivity activity = new BlogActivity();
 
-    @Column(nullable = false)
-    private int totalLikes = 0;
-
-    @Column(nullable = false)
-    private int totalComments = 0;
-
-    @Column(nullable = false)
-    private int totalReads = 0;
-
-    @Column(name = "total_parent_comments", nullable = false)
-    private int totalParentComments = 0;
-
-    @Column(nullable = false)
+    @Column(columnDefinition = "boolean default false")
     private boolean draft = false;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-
     @JsonIgnore
-    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    @Column(name = "published_at", nullable = false, updatable = false)
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "blog_tags",
+            joinColumns = @JoinColumn(name = "blog_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
+
     @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp publishedAt;
+    @CreationTimestamp
+    @Column(name = "created_on", length = 50, updatable = false)
+    private Date createdOn;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    @Column(name = "modified_on", length = 50)
+    private Date modifiedOn;
+
+    @Column(columnDefinition = "int default 0")
+    private int isDeleted;
 
 }

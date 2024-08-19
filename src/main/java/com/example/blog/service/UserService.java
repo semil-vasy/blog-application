@@ -1,23 +1,17 @@
 package com.example.blog.service;
 
-import com.example.blog.dto.ApiResponse;
-import com.example.blog.dto.jwt.JwtAuthRequest;
-import com.example.blog.dto.jwt.JwtAuthResponse;
-import com.example.blog.dto.user.UserFormDto;
+import com.example.blog.dto.user.UserDTO;
+import com.example.blog.model.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    ApiResponse registerUser(UserFormDto userFormDto);
+    UserDTO updateUser(UserDTO userDTO);
 
-    JwtAuthResponse loginUser(JwtAuthRequest request);
+    UserDTO getUserByUsername(String username);
 
-    UserFormDto updateUser(UserFormDto userFormDto, Long userId);
-
-    UserFormDto getUserById(Long userId);
-
-    List<UserFormDto> getAllUsers();
+    List<User> getAllUsers();
 
     void deleteUser(Long userId);
 

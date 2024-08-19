@@ -1,105 +1,80 @@
 package com.example.blog.service.impl;
 
-import com.example.blog.config.AppConstant;
-import com.example.blog.dto.ApiResponse;
-import com.example.blog.dto.jwt.JwtAuthRequest;
-import com.example.blog.dto.jwt.JwtAuthResponse;
-import com.example.blog.dto.user.UserFormDto;
+import com.example.blog.dto.user.SocialLinksDTO;
+import com.example.blog.dto.user.UserDTO;
 import com.example.blog.exception.ResourceNotFoundException;
-import com.example.blog.model.Role;
+import com.example.blog.model.SocialLinks;
 import com.example.blog.model.User;
-import com.example.blog.repository.RoleRepository;
 import com.example.blog.repository.UserRepository;
-import com.example.blog.security.CustomUserDetailService;
-import com.example.blog.security.JwtTokenHelper;
 import com.example.blog.service.UserService;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-    private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
-    private final JwtTokenHelper jwtTokenHelper;
-    private final AuthenticationManager authenticationManager;
-    private final CustomUserDetailService userDetailsService;
 
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepository, JwtTokenHelper jwtTokenHelper, AuthenticationManager authenticationManager, CustomUserDetailService userDetailsService) {
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
-        this.passwordEncoder = passwordEncoder;
-        this.roleRepository = roleRepository;
-        this.jwtTokenHelper = jwtTokenHelper;
-        this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
     }
 
-
     @Override
-    public ApiResponse registerUser(UserFormDto userFormDto) {
-        User user = this.modelMapper.map(userFormDto, User.class);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public UserDTO updateUser(UserDTO userDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
 
-        Role role = this.roleRepository.findById(AppConstant.NORMAL_USER)
-                .orElseThrow(() -> new ResourceNotFoundException("Role", "Id", AppConstant.NORMAL_USER));
+        if (user == null)
+            throw new UsernameNotFoundException("User not found");
 
-        user.setRoles(Collections.singletonList(role));
+        updateIfDifferent(user::setEmail, user.getEmail(), userDTO.getEmail());
+        updateIfDifferent(user::setUsername, user.getUsername(), userDTO.getUsername());
+        updateIfDifferent(user::setFirstName, user.getFirstName(), userDTO.getFirstName());
+        updateIfDifferent(user::setLastName, user.getLastName(), userDTO.getLastName());
+        updateIfDifferent(user::setBio, user.getBio(), userDTO.getBio());
+
+        if (userDTO.getSocialLinks() != null) {
+            SocialLinks socialLinks = user.getSocialLinks();
+            SocialLinksDTO socialLinksDTO = userDTO.getSocialLinks();
+
+            updateIfDifferent(socialLinks::setYoutube, socialLinks.getYoutube(), socialLinksDTO.getYoutube());
+            updateIfDifferent(socialLinks::setInstagram, socialLinks.getInstagram(), socialLinksDTO.getInstagram());
+            updateIfDifferent(socialLinks::setFacebook, socialLinks.getFacebook(), socialLinksDTO.getFacebook());
+            updateIfDifferent(socialLinks::setTwitter, socialLinks.getTwitter(), socialLinksDTO.getTwitter());
+            updateIfDifferent(socialLinks::setGithub, socialLinks.getGithub(), socialLinksDTO.getGithub());
+            updateIfDifferent(socialLinks::setWebsite, socialLinks.getWebsite(), socialLinksDTO.getWebsite());
+        }
 
         this.userRepository.save(user);
-        return new ApiResponse(201, true, "Registration successful! Please log in.");
+
+        return modelMapper.map(user, UserDTO.class);
+    }
+
+    private <T> void updateIfDifferent(Consumer<T> setter, T currentValue, T newValue) {
+        if (!Objects.equals(currentValue, newValue)) {
+            setter.accept(newValue);
+        }
     }
 
     @Override
-    public JwtAuthResponse loginUser(JwtAuthRequest request) {
-        this.authenticate(request.getUsername(), request.getPassword());
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(request.getUsername());
-        String token = this.jwtTokenHelper.generateToken(userDetails);
-        return JwtAuthResponse.builder().token(token).status(200).success(true).build();
-    }
-
-
-    @Override
-    public UserFormDto updateUser(UserFormDto userFormDto, Long userId) {
-
-        User user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-
-        user.setFirstName(userFormDto.getFirstName());
-        user.setEmail(userFormDto.getEmail());
-        user.setPassword(userFormDto.getPassword());
-        user.setBio(userFormDto.getBio());
-
-        User savedUser = this.userRepository.save(user);
-
-        return this.userToDto(savedUser);
+    public UserDTO getUserByUsername(String username) {
+        UserDTO user = this.userRepository.getDTOByUsername(username);
+        if (user == null)
+            throw new ResourceNotFoundException("User", "Username", username);
+        return user;
     }
 
     @Override
-    public UserFormDto getUserById(Long userId) {
-        User user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
-
-        return this.userToDto(user);
-    }
-
-    @Override
-    public List<UserFormDto> getAllUsers() {
-        List<User> users = this.userRepository.findAll();
-        return users.stream().map(this::userToDto).toList();
+    public List<User> getAllUsers() {
+        return this.userRepository.findAll();
     }
 
     @Override
@@ -108,23 +83,5 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
         this.userRepository.delete(user);
-    }
-
-    private void authenticate(String username, String password) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-        try {
-            Authentication authenticate = this.authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authenticate);
-        } catch (BadCredentialsException | InternalAuthenticationServiceException exception) {
-            throw new UsernameNotFoundException("Invalid username or password");
-        }
-    }
-
-    public User dtoToUser(UserFormDto userFormDto) {
-        return this.modelMapper.map(userFormDto, User.class);
-    }
-
-    public UserFormDto userToDto(User user) {
-        return this.modelMapper.map(user, UserFormDto.class);
     }
 }

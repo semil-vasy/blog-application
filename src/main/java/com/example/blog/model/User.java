@@ -2,7 +2,8 @@ package com.example.blog.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,7 +16,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
 public class User implements UserDetails {
 
     @Id
@@ -34,29 +36,17 @@ public class User implements UserDetails {
     @Column
     private String password;
 
-    @Column(columnDefinition = "text")
+    @Column(length = 200)
     private String bio;
 
     @Column
     private String profileImage;
 
-    @Column
-    private String youtubeLink;
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
 
-    @Column
-    private String instagramLink;
-
-    @Column
-    private String facebookLink;
-
-    @Column
-    private String twitterLink;
-
-    @Column
-    private String githubLink;
-
-    @Column
-    private String websiteLink;
+    @Embedded
+    private SocialLinks socialLinks;
 
     @Column(nullable = false, columnDefinition = "int default 0")
     private int totalPosts;
@@ -71,10 +61,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Blog> blogs;
 
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Comment> comments;
-
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "roleId"))
     private List<Role> roles;
@@ -88,6 +74,9 @@ public class User implements UserDetails {
     @UpdateTimestamp
     @Column(name = "modified_on", length = 50)
     private Date modifiedOn;
+
+    @Column(columnDefinition = "int default 0")
+    private int isDeleted;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

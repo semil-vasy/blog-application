@@ -1,15 +1,12 @@
 package com.example.blog.controller;
 
 import com.example.blog.dto.ApiResponse;
-import com.example.blog.dto.user.UserFormDto;
+import com.example.blog.dto.user.UserDTO;
 import com.example.blog.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("api/users")
@@ -21,19 +18,14 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("")
-    ResponseEntity<List<UserFormDto>> getAllUsers() {
-        return ResponseEntity.ok(this.userService.getAllUsers());
+    @GetMapping("{username}")
+    ResponseEntity<UserDTO> getUserByUsername(@PathVariable("username") String username) {
+        return ResponseEntity.ok(this.userService.getUserByUsername(username));
     }
 
-    @GetMapping("{id}")
-    ResponseEntity<UserFormDto> getUserById(@PathVariable("id") long userId) {
-        return ResponseEntity.ok(this.userService.getUserById(userId));
-    }
-
-    @PutMapping("{id}")
-    ResponseEntity<UserFormDto> updateUser(@Valid @PathVariable("id") long userId, @RequestBody UserFormDto userFormDto) {
-        UserFormDto updatedUser = this.userService.updateUser(userFormDto, userId);
+    @PutMapping
+    ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO) {
+        UserDTO updatedUser = this.userService.updateUser(userDTO);
         return ResponseEntity.ok(updatedUser);
     }
 

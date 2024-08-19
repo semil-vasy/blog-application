@@ -44,7 +44,7 @@ public class CommentServiceImpl implements CommentService {
         Blog blog = this.postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
         Comment comment = this.modelMapper.map(commentDto, Comment.class);
         comment.setBlog(blog);
-        comment.setUser(user);
+        comment.setCommentedBy(user);
         Comment savedComment = this.commentRepository.save(comment);
 
         return this.modelMapper.map(savedComment, CommentDto.class);

@@ -7,15 +7,15 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class PostDto {
+public class BlogDto {
 
-    private long postId;
+    private long blogId;
 
-    private String postTitle;
+    private String blogTitle;
 
-    private String postContent;
+    private String blogContent;
 
-    private String postImage;
+    private String blogImage;
 
     private Date createdAt;
 

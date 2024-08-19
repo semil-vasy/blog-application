@@ -5,9 +5,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PostResponse {
+public class BlogResponse {
 
-    private List<PostDto> data;
+    private List<BlogDto> data;
     private int pageNumber;
     private int pageSize;
     private long totalElements;
