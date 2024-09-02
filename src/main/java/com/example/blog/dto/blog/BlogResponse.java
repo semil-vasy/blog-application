@@ -7,7 +7,7 @@ import java.util.List;
 @Data
 public class BlogResponse {
 
-    private List<BlogDto> data;
+    private List<BlogDTO> data;
     private int pageNumber;
     private int pageSize;
     private long totalElements;

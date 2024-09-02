@@ -1,9 +1,9 @@
 package com.example.blog.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -18,7 +18,8 @@ public class Tag {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @ManyToMany(mappedBy = "tags")
-    private Set<Blog> blogs = new HashSet<>();
+    @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Blog> blogs;
 
 }

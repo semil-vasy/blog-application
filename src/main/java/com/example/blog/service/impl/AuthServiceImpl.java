@@ -20,7 +20,6 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -67,8 +66,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public JwtAuthResponse loginUser(JwtAuthRequest request) {
         this.authenticate(request.getEmail(), request.getPassword());
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(request.getEmail());
-        String token = this.jwtTokenHelper.generateToken(userDetails);
+        String token = this.jwtTokenHelper.generateToken(request.getEmail());
         return JwtAuthResponse.builder().token(token).status(200).success(true).build();
     }
 

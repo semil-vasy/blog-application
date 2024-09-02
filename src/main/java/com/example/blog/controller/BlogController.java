@@ -2,11 +2,12 @@ package com.example.blog.controller;
 
 import com.example.blog.config.AppConstant;
 import com.example.blog.dto.ApiResponse;
-import com.example.blog.dto.blog.BlogDto;
+import com.example.blog.dto.blog.BlogDTO;
 import com.example.blog.dto.blog.BlogResponse;
 import com.example.blog.service.BlogService;
 import com.example.blog.service.FileService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,10 +35,17 @@ public class BlogController {
         this.blogService = blogService;
         this.fileService = fileService;
     }
-    
+
+
+    @PostMapping("blog")
+    ResponseEntity<BlogDTO> createBlog(@Valid @RequestBody BlogDTO blogDto) {
+        BlogDTO createdBlog = this.blogService.createBlog(blogDto);
+        return new ResponseEntity<>(createdBlog, HttpStatus.CREATED);
+    }
+
     @GetMapping("user/{userId}/blog")
-    ResponseEntity<List<BlogDto>> getBlogByUser(@PathVariable long userId) {
-        List<BlogDto> blogs = this.blogService.getBlogByUser(userId);
+    ResponseEntity<List<BlogDTO>> getBlogByUser(@PathVariable long userId) {
+        List<BlogDTO> blogs = this.blogService.getBlogByUser(userId);
         return new ResponseEntity<>(blogs, HttpStatus.OK);
     }
 
@@ -53,22 +61,17 @@ public class BlogController {
     }
 
     @GetMapping("blog/{blogId}")
-    ResponseEntity<BlogDto> getBlogById(@PathVariable long blogId) {
-        BlogDto blogDto = this.blogService.getBlogById(blogId);
+    ResponseEntity<BlogDTO> getBlogById(@PathVariable long blogId) {
+        BlogDTO blogDto = this.blogService.getBlogById(blogId);
         return new ResponseEntity<>(blogDto, HttpStatus.OK);
     }
 
     @GetMapping("blog/search/{keyword}")
-    ResponseEntity<List<BlogDto>> searchTitle(@PathVariable String keyword) {
-        List<BlogDto> blogDtos = this.blogService.searchTitle(keyword);
-        return new ResponseEntity<>(blogDtos, HttpStatus.OK);
+    ResponseEntity<List<BlogDTO>> searchTitle(@PathVariable String keyword) {
+        List<BlogDTO> blogDTOS = this.blogService.searchTitle(keyword);
+        return new ResponseEntity<>(blogDTOS, HttpStatus.OK);
     }
 
-    @PostMapping("user/{userId}/category/{categoryId}/blog")
-    ResponseEntity<BlogDto> createBlog(@RequestBody BlogDto blogDto, @PathVariable long userId, @PathVariable long categoryId) {
-        BlogDto createdBlog = this.blogService.createBlog(blogDto, userId, categoryId);
-        return new ResponseEntity<>(createdBlog, HttpStatus.CREATED);
-    }
 
     @DeleteMapping("blog/{blogId}")
     ResponseEntity<ApiResponse> deleteBlog(@PathVariable long blogId) {
@@ -77,19 +80,19 @@ public class BlogController {
     }
 
     @PutMapping("blog/{blogId}")
-    ResponseEntity<BlogDto> updateBlog(@RequestBody BlogDto blogDto, @PathVariable long blogId) {
-        BlogDto updatedBlog = this.blogService.updateBlog(blogDto, blogId);
+    ResponseEntity<BlogDTO> updateBlog(@RequestBody BlogDTO blogDto, @PathVariable long blogId) {
+        BlogDTO updatedBlog = this.blogService.updateBlog(blogDto, blogId);
         return new ResponseEntity<>(updatedBlog, HttpStatus.OK);
     }
 
     @PostMapping("blog/image/upload/{blogId}")
-    public ResponseEntity<BlogDto> uploadImage(@RequestParam MultipartFile image, @PathVariable long blogId) throws IOException {
-        BlogDto blogDto = this.blogService.getBlogById(blogId);
+    public ResponseEntity<BlogDTO> uploadImage(@RequestParam MultipartFile image, @PathVariable long blogId) throws IOException {
+        BlogDTO blogDto = this.blogService.getBlogById(blogId);
         String fileName = this.fileService.uploadImage(path, image);
-        blogDto.setBlogImage(fileName);
-        BlogDto updatedBlog = this.blogService.updateBlog(blogDto, blogId);
+        blogDto.setBanner(fileName);
+        BlogDTO updatedBlog = this.blogService.updateBlog(blogDto, blogId);
 
-        return new ResponseEntity<BlogDto>(updatedBlog, HttpStatus.OK);
+        return new ResponseEntity<>(updatedBlog, HttpStatus.OK);
 
     }
 

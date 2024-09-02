@@ -29,8 +29,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO updateUser(UserDTO userDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+
+        User user = getAuthUser();
 
         if (user == null)
             throw new UsernameNotFoundException("User not found");
@@ -83,5 +83,11 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "Id", userId));
 
         this.userRepository.delete(user);
+    }
+
+    @Override
+    public User getAuthUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 }

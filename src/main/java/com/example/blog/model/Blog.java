@@ -48,7 +48,7 @@ public class Blog {
     @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.MERGE)
     @JoinTable(
             name = "blog_tags",
             joinColumns = @JoinColumn(name = "blog_id"),
