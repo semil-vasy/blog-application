@@ -5,7 +5,6 @@ import com.example.blog.dto.user.UserDTO;
 import com.example.blog.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,7 +28,6 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     ResponseEntity<ApiResponse> deleteUser(@PathVariable("id") long userId) {
         this.userService.deleteUser(userId);

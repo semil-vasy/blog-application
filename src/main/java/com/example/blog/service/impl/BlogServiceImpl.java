@@ -54,14 +54,14 @@ public class BlogServiceImpl implements BlogService {
 
     public Set<TagDTO> saveTags(Set<TagDTO> tagDTOs) {
         // Fetch all existing tags from the database that match the names in the incoming tags
-        Set<String> tagNames = tagDTOs.stream().map(TagDTO::getName).collect(Collectors.toSet());
+        Set<String> tagNames = tagDTOs.stream().map(TagDTO::getTagName).collect(Collectors.toSet());
         Set<TagDTO> existingTags = new HashSet<>(tagRepository.findByNameIn(tagNames));
 
         // Convert TagDTOs to Tags, skipping already existing tags
         Set<TagDTO> newTags = tagDTOs.stream()
                 .filter(tagDTO -> existingTags.stream()
-                        .noneMatch(tag -> tag.getName().equals(tagDTO.getName())))
-                .map(tagDTO -> new TagDTO(tagDTO.getName()))
+                        .noneMatch(tag -> tag.getTagName().equals(tagDTO.getTagName())))
+                .map(tagDTO -> new TagDTO(tagDTO.getTagName()))
                 .collect(Collectors.toSet());
 
         // Combine the new tags with the existing ones

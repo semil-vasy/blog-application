@@ -22,7 +22,5 @@ public class UserDTO implements Serializable {
     private String bio;
     private SocialLinksDTO socialLinks;
     private Date createdOn;
-    private int totalPosts;
-    private int totalReads;
     private String profileImage;
 }

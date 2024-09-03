@@ -48,12 +48,6 @@ public class User implements UserDetails {
     @Embedded
     private SocialLinks socialLinks;
 
-    @Column(nullable = false, columnDefinition = "int default 0")
-    private int totalPosts;
-
-    @Column(nullable = false, columnDefinition = "int default 0")
-    private int totalReads;
-
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean googleAuth;
 

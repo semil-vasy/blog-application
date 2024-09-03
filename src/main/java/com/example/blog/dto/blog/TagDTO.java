@@ -10,10 +10,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TagDTO implements Serializable {
-    private Long id;
-    private String name;
+    private Long tagId;
+    private String tagName;
 
     public TagDTO(String name) {
-        this.name = name;
+        this.tagName = name;
     }
 }

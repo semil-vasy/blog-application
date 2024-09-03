@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT new com.example.blog.dto.user.UserDTO(u.email, u.username, u.firstName, u.lastName, u.bio, " +
             "new com.example.blog.dto.user.SocialLinksDTO(u.socialLinks.youtube, u.socialLinks.instagram, u.socialLinks.facebook, u.socialLinks.twitter, u.socialLinks.github, u.socialLinks.website), " +
-            "u.createdOn, u.totalPosts, u.totalReads, u.profileImage) " +
+            "u.createdOn, u.profileImage) " +
             "FROM User u WHERE u.username = :username and u.isDeleted = 0")
     UserDTO getDTOByUsername(String username);
 
