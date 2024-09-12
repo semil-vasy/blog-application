@@ -16,5 +16,6 @@ public interface UserService {
     void deleteUser(Long userId);
 
     User getAuthUser();
+    List<UserDTO> getUserBySearchKey(String searchKey);
 
 }

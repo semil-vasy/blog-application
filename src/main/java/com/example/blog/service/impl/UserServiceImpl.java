@@ -90,4 +90,9 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (User) authentication.getPrincipal();
     }
+
+    @Override
+    public List<UserDTO> getUserBySearchKey(String searchKey) {
+        return userRepository.getUserBySearchType(searchKey);
+    }
 }
