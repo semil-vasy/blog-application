@@ -1,9 +1,8 @@
 package com.example.blog.controller;
 
-import com.example.blog.config.AppConstant;
 import com.example.blog.dto.ApiResponse;
+import com.example.blog.dto.blog.BlogCustomDTO;
 import com.example.blog.dto.blog.BlogDTO;
-import com.example.blog.dto.blog.BlogResponse;
 import com.example.blog.service.BlogService;
 import com.example.blog.service.FileService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +20,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/")
+@RequestMapping("/api/blog")
 public class BlogController {
 
     private final BlogService blogService;
@@ -36,67 +35,65 @@ public class BlogController {
         this.fileService = fileService;
     }
 
+    @GetMapping
+    ResponseEntity<List<BlogCustomDTO>> getAllBlogs(
+            @RequestParam(value = "userId", defaultValue = "0", required = false) long userId,
+            @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
+            @RequestParam(value = "limit", defaultValue = "10", required = false) int limit,
+            @RequestParam(value = "tagNames", defaultValue = "", required = false) String tagNames
+    ) {
+        List<BlogCustomDTO> blogResponse = this.blogService.getAllBlog(userId, offset, limit, tagNames);
+        return new ResponseEntity<>(blogResponse, HttpStatus.OK);
+    }
 
-    @PostMapping("blog")
+    @GetMapping("trending")
+    ResponseEntity<List<BlogCustomDTO>> getTrendingBlogs() {
+        List<BlogCustomDTO> blogResponse = this.blogService.getTrendingBlogs();
+        return new ResponseEntity<>(blogResponse, HttpStatus.OK);
+    }
+
+    @GetMapping("{blogId}")
+    ResponseEntity<BlogCustomDTO> getBlogByBlogId(@PathVariable String blogId) {
+        BlogCustomDTO blogDto = this.blogService.getBlogByBlogId(blogId);
+        return new ResponseEntity<>(blogDto, HttpStatus.OK);
+    }
+
+    @PostMapping
     ResponseEntity<BlogDTO> createBlog(@Valid @RequestBody BlogDTO blogDto) {
         BlogDTO createdBlog = this.blogService.createBlog(blogDto);
         return new ResponseEntity<>(createdBlog, HttpStatus.CREATED);
     }
 
-    @GetMapping("user/{userId}/blog")
-    ResponseEntity<List<BlogDTO>> getBlogByUser(@PathVariable long userId) {
-        List<BlogDTO> blogs = this.blogService.getBlogByUser(userId);
-        return new ResponseEntity<>(blogs, HttpStatus.OK);
-    }
-
-    @GetMapping("blog")
-    ResponseEntity<BlogResponse> getAllBlogs(
-            @RequestParam(value = "pageNumber", defaultValue = AppConstant.PAGE_NUMBER, required = false) int pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = AppConstant.PAGE_SIZE, required = false) int pageSize,
-            @RequestParam(value = "sortBy", defaultValue = AppConstant.SORT_BY, required = false) String sortBy,
-            @RequestParam(value = "sortDir", defaultValue = AppConstant.SORT_DIR, required = false) String sortDir
-    ) {
-        BlogResponse blogResponse = this.blogService.getAllBlog(pageSize, pageNumber, sortBy, sortDir);
-        return new ResponseEntity<>(blogResponse, HttpStatus.OK);
-    }
-
-    @GetMapping("blog/{blogId}")
-    ResponseEntity<BlogDTO> getBlogById(@PathVariable long blogId) {
-        BlogDTO blogDto = this.blogService.getBlogById(blogId);
-        return new ResponseEntity<>(blogDto, HttpStatus.OK);
-    }
-
-    @GetMapping("blog/search/{keyword}")
-    ResponseEntity<List<BlogDTO>> searchTitle(@PathVariable String keyword) {
-        List<BlogDTO> blogDTOS = this.blogService.searchTitle(keyword);
-        return new ResponseEntity<>(blogDTOS, HttpStatus.OK);
-    }
-
-
-    @DeleteMapping("blog/{blogId}")
+    @DeleteMapping("{blogId}")
     ResponseEntity<ApiResponse> deleteBlog(@PathVariable long blogId) {
         this.blogService.deleteBlog(blogId);
         return new ResponseEntity<>(new ApiResponse(200, true, "Blog deleted successfully"), HttpStatus.OK);
     }
 
-    @PutMapping("blog/{blogId}")
+    @PutMapping("{blogId}")
     ResponseEntity<BlogDTO> updateBlog(@RequestBody BlogDTO blogDto, @PathVariable long blogId) {
         BlogDTO updatedBlog = this.blogService.updateBlog(blogDto, blogId);
         return new ResponseEntity<>(updatedBlog, HttpStatus.OK);
     }
 
-    @PostMapping("blog/image/upload/{blogId}")
-    public ResponseEntity<BlogDTO> uploadImage(@RequestParam MultipartFile image, @PathVariable long blogId) throws IOException {
-        BlogDTO blogDto = this.blogService.getBlogById(blogId);
-        String fileName = this.fileService.uploadImage(path, image);
-        blogDto.setBanner(fileName);
-        BlogDTO updatedBlog = this.blogService.updateBlog(blogDto, blogId);
+    @GetMapping("/search/{keyword}")
+    ResponseEntity<List<BlogDTO>> searchTitle(@PathVariable String keyword) {
+        List<BlogDTO> blogDTOS = this.blogService.searchTitle(keyword);
+        return new ResponseEntity<>(blogDTOS, HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(updatedBlog, HttpStatus.OK);
+    @PostMapping("/image/upload/{blogId}")
+    public ResponseEntity<BlogCustomDTO> uploadImage(@RequestParam MultipartFile image, @PathVariable String blogId) throws IOException {
+        BlogCustomDTO blogDto = this.blogService.getBlogByBlogId(blogId);
+//        String fileName = this.fileService.uploadImage(path, image);
+//        blogDto.setBanner(fileName);
+//        BlogDTO updatedBlog = this.blogService.updateBlog(blogDto, blogId);
+
+        return new ResponseEntity<>(blogDto, HttpStatus.OK);
 
     }
 
-    @GetMapping(value = "blog/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
     public void downloadImage(@PathVariable String imageName, HttpServletResponse response) throws IOException {
         InputStream image = this.fileService.getResource(path, imageName);
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);

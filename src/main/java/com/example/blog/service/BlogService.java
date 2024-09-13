@@ -1,11 +1,15 @@
 package com.example.blog.service;
 
+import com.example.blog.dto.blog.BlogCustomDTO;
 import com.example.blog.dto.blog.BlogDTO;
-import com.example.blog.dto.blog.BlogResponse;
 
 import java.util.List;
 
 public interface BlogService {
+
+    List<BlogCustomDTO> getAllBlog(long userId, int offset, int limit, String tagNames);
+
+    List<BlogCustomDTO> getTrendingBlogs();
 
     BlogDTO createBlog(BlogDTO blogDto);
 
@@ -13,11 +17,7 @@ public interface BlogService {
 
     void deleteBlog(long postId);
 
-    BlogResponse getAllBlog(int pageSize, int pageNumber, String sortBy, String sortDir);
-
-    BlogDTO getBlogById(long postId);
-
-    List<BlogDTO> getBlogByUser(long userId);
+    BlogCustomDTO getBlogByBlogId(String postId);
 
     List<BlogDTO> searchTitle(String keyword);
 

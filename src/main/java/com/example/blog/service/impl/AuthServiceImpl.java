@@ -53,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
         User user = this.modelMapper.map(userFormDto, User.class);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUsername(user.getEmail().split("@")[0]);
+        user.setProfileImage(AppConstant.DUMMY_IMAGE_URL);
 
         Role role = this.roleRepository.findById(AppConstant.NORMAL_USER)
                 .orElseThrow(() -> new ResourceNotFoundException("Role", "Id", AppConstant.NORMAL_USER));
