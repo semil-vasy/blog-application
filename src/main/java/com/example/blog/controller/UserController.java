@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/users")
 public class UserController {
@@ -20,6 +22,11 @@ public class UserController {
     @GetMapping("{username}")
     ResponseEntity<UserDTO> getUserByUsername(@PathVariable("username") String username) {
         return ResponseEntity.ok(this.userService.getUserByUsername(username));
+    }
+
+    @GetMapping("search")
+    ResponseEntity<List<UserDTO>> searchUsers(@RequestParam(defaultValue = "") String searchKey){
+        return ResponseEntity.ok(this.userService.getUserBySearchKey(searchKey));
     }
 
     @PutMapping
