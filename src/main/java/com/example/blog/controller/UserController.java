@@ -45,6 +45,6 @@ public class UserController {
     @PostMapping("/uploadImage/{userId}")
     ResponseEntity<ApiResponse> uploadImage(@PathVariable("userId") long userId,@RequestBody MultipartFile image){
         this.userService.uploadImage(userId,image);
-        return  new ResponseEntity<>(new ApiResponse(200,true,""),HttpStatus.OK);
+        return  new ResponseEntity<>(new ApiResponse(200,true,"Image Uploaded Successfully!"),HttpStatus.OK);
     }
 }
