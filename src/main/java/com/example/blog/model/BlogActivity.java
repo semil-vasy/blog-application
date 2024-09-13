@@ -12,8 +12,5 @@ public class BlogActivity {
     private int totalLikes = 0;
 
     @Column(columnDefinition = "int default 0")
-    private int totalComments = 0;
-
-    @Column(columnDefinition = "int default 0")
     private int totalReads = 0;
 }

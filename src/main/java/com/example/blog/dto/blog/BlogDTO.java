@@ -10,13 +10,14 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
-public class BlogDTO {
+public class BlogDTO implements Serializable {
     private String blogId;
 
     @NotEmpty(message = "Please insert title")
