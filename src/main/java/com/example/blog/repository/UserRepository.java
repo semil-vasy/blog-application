@@ -34,6 +34,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Modifying
     @Transactional
-    @Query("update User set profileImage = :image where userId= :userId")
+    @Query(value = "update users set profile_image = :image where user_id= :userId", nativeQuery = true)
     void uploadImage(@Param("image") String image,@Param("userId") long userId);
 }

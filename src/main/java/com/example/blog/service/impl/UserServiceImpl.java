@@ -100,10 +100,12 @@
 
         @Override
         public String uploadImage(long userId, MultipartFile image){
+
+            User user = getAuthUser();
             try {
                 Map data  =this.cloudinary.uploader().upload(image.getBytes(),Map.of());
                 String url = (String) data.get("url");
-                userRepository.uploadImage(url,userId);
+                userRepository.uploadImage(url,user.getUserId());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
