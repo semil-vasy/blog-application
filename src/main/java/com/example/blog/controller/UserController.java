@@ -6,6 +6,7 @@ import com.example.blog.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -41,4 +42,9 @@ public class UserController {
         return new ResponseEntity<>(new ApiResponse(200, true, "User Deleted Successfully"), HttpStatus.OK);
     }
 
+    @PostMapping("/uploadImage/{userId}")
+    ResponseEntity<ApiResponse> uploadImage(@PathVariable("userId") long userId,@RequestBody MultipartFile image){
+        this.userService.uploadImage(userId,image);
+        return  new ResponseEntity<>(new ApiResponse(200,true,"Image Uploaded Successfully!"),HttpStatus.OK);
+    }
 }
