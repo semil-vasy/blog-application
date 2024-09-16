@@ -4,6 +4,7 @@ import com.example.blog.dto.blog.BlogDTO;
 import com.example.blog.dto.blog.BlogResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BlogService {
 
@@ -21,5 +22,5 @@ public interface BlogService {
 
     List<BlogDTO> searchTitle(String keyword);
 
-
+    Map<String,String> getBlogCountAndReads(long userId);
 }

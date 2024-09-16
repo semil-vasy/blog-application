@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -127,5 +128,11 @@ public class BlogServiceImpl implements BlogService {
     public List<BlogDTO> searchTitle(String keyword) {
         List<Blog> blogs = this.blogRepository.findByBlogTitleLike("%" + keyword.toLowerCase() + "%");
         return blogs.stream().map(blog -> this.modelMapper.map(blog, BlogDTO.class)).toList();
+    }
+
+    @Override
+    public Map<String, String> getBlogCountAndReads(long userId) {
+       Map<String,String> blogs = blogRepository.getBlogCountAndBlogReads(userId);
+       return blogs;
     }
 }

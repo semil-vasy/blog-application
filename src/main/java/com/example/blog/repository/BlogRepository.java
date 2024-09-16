@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BlogRepository extends JpaRepository<Blog, Long> {
 
@@ -15,4 +16,7 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
 
     @Query("select p from Blog p where lower(p.title) LIKE :key")
     List<Blog> findByBlogTitleLike(@Param("key") String keyword);
+
+    @Query(nativeQuery = true,value = "select sum(total_reads), count(1) from blog where user_id = :userId\n")
+    Map<String,String> getBlogCountAndBlogReads(long userId);
 }

@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/")
@@ -102,4 +103,13 @@ public class BlogController {
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);
         StreamUtils.copy(image, response.getOutputStream());
     }
+
+    @GetMapping("/blog-count/{userId}")
+    public String  getCountofBlogs(@PathVariable long userId){
+        Map<String,String> count = blogService.getBlogCountAndReads(userId);
+        String counts = String.valueOf(count.get("count"));
+        String reads = String.valueOf(count.get("sum"));
+        return  counts + " " + reads;
+    }
 }
+
